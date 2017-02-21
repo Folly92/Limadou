@@ -55,13 +55,23 @@ TCanvas *display_ladders1D(TH1D *full_histo,std::string name,std::string title,d
   display->Divide(3,2);
   TH1D *ladder[N_LADDER];
   for(int ld=0;ld<N_LADDER;++ld){
+    int pad;
+    if (ld==0) pad=1;
+    else if(ld==1) pad=4;
+    else if(ld==2) pad=2;
+    else if(ld==3) pad=5;
+    else if(ld==4) pad=3;
+    else if(ld==5) pad=6;
      std::stringstream Stream;
      Stream<<name<<"ladder_" << ld;
     ladder[ld]=new TH1D(Stream.str().c_str(),(name+title).c_str(),xrange,0,xrange);
      for(int bn=0;bn<LADDER_BIN;++bn)
       ladder[ld]->SetBinContent(bn+1,full_histo->GetBinContent(ld*xrange+bn));
      ladder[ld]->SetStats(0);
+     display->cd(pad);
+     ladder[ld]->Draw("same");
   }
+  /*
   display->cd(1);
   ladder[0]->Draw("same");
   display->cd(4);
@@ -74,6 +84,7 @@ TCanvas *display_ladders1D(TH1D *full_histo,std::string name,std::string title,d
   ladder[4]->Draw("same");
   display->cd(6);
   ladder[5]->Draw("same");
+  */
   return display;
 }
 
@@ -88,6 +99,13 @@ TCanvas *display_ladders2D(TH2D *full_histo,std::string name,std::string title){
   
   TH2D *ladder[N_LADDER];
   for(int ld=0;ld<N_LADDER;++ld){
+     int pad;
+    if (ld==0) pad=1;
+    else if(ld==1) pad=4;
+    else if(ld==2) pad=2;
+    else if(ld==3) pad=5;
+    else if(ld==4) pad=3;
+    else if(ld==5) pad=6;
     std::stringstream Stream;
     Stream<<name<<"ladder_" << ld;
     ladder[ld]=new TH2D(Stream.str().c_str(),(name+title).c_str(),xbin,0,xbin,ybin,ymin,ymax);
@@ -96,7 +114,12 @@ TCanvas *display_ladders2D(TH2D *full_histo,std::string name,std::string title){
 	ladder[ld]->SetBinContent(xch,ych,full_histo->GetBinContent(ld*xbin+xch,ych));  
     }
     ladder[ld]->SetStats(0);
+    display->cd(pad);
+    gPad->cd(pad);
+    gPad->SetLogz();
+    ladder[ld]->Draw("zcol");
   }
+  /*
   display->cd(1);
   gPad->cd(1);
   gPad->SetLogz();
@@ -122,6 +145,7 @@ TCanvas *display_ladders2D(TH2D *full_histo,std::string name,std::string title){
   gPad->cd(6);
   gPad->SetLogz();
   ladder[5]->Draw("zcol");
+  */
   return display;
 }
 
@@ -145,8 +169,20 @@ TCanvas* drawing2D(TH2D *histo,std::string title){
 TCanvas *drawing6_1D(TH1D *ladder[N_LADDER]){
   TCanvas *display=new TCanvas();
  display->Divide(3,2);
-  for(int i=0;i<N_LADDER;++i)
+ for(int i=0;i<N_LADDER;++i){
+    int pad;
+    if (i==0) pad=1;
+    else if(i==1) pad=4;
+    else if(i==2) pad=2;
+    else if(i==3) pad=5;
+    else if(i==4) pad=3;
+    else if(i==5) pad=6;
     ladder[i]->SetStats(0);
+    display->cd(pad);
+    gPad->cd(pad);
+    ladder[i]->Draw("");
+ }
+ /*
   display->cd(1);
   ladder[0]->Draw("");
   display->cd(4);
@@ -159,6 +195,7 @@ TCanvas *drawing6_1D(TH1D *ladder[N_LADDER]){
   ladder[4]->Draw("");
   display->cd(6);
   ladder[5]->Draw("");
+ */
   return display;
 }
 
@@ -167,10 +204,20 @@ TCanvas *drawing6_2D(TH2D *ladder[N_LADDER]){
   TCanvas *display=new TCanvas();
  display->Divide(3,2);
  for(int i=0;i<N_LADDER;++i){
+   int pad;
+    if (i==0) pad=1;
+    else if(i==1) pad=4;
+    else if(i==2) pad=2;
+    else if(i==3) pad=5;
+    else if(i==4) pad=3;
+    else if(i==5) pad=6;
     ladder[i]->SetStats(0);
-    gPad->cd(i+1);
+    display->cd(pad);
+    gPad->cd(pad);
     gPad->SetLogz();
+     ladder[i]->Draw("zcol");
  }
+ /*
   display->cd(1);
   gPad->cd(1);
   gPad->SetLogz();
@@ -195,6 +242,7 @@ TCanvas *drawing6_2D(TH2D *ladder[N_LADDER]){
   gPad->cd(6);
   gPad->SetLogz();
   ladder[5]->Draw("zcol");
+ */
   return display;
 }
 
@@ -365,6 +413,8 @@ TH1D *deltax_central_ladder_noeta_n_hist=new TH1D("deltax_central_ladder_noeta_n
   
   TH1D *real_charge_center_p_hist[N_LADDER];
   TH1D *real_charge_center_n_hist[N_LADDER];
+
+  TH2D *charge_sharing_pn_histo[N_LADDER];
   
   for(int ld=0;ld<N_LADDER;++ld){
     sum_adc_p_hist[ld]=new TH1D(Form("ADC_entries_p_%d",ld),Form("ADC_entries_p_%d;ADC;",ld),500,0,500);
@@ -426,6 +476,8 @@ clusterseed_p1_n_histo[ld]=new TH2D(Form("clusterseed_p1_n_%d",ld),Form("cluster
 
   cluster_shape_p_histo[ld]=new TH2D(Form("cluster_shape_p_%d",ld),Form("cluster_shape_p_%d;position;SN",ld),5,0,5,100,-10,50);
   cluster_shape_n_histo[ld]=new TH2D(Form("cluster_shape_n_%d",ld),Form("cluster_shape_n_%d;position;SN",ld),5,0,5,100,-10,50);
+
+  charge_sharing_pn_histo[ld]=new TH2D(Form("charge_sharing_pn_%d",ld),Form("charge_sharing_pn_%d;p side [ADC];n side [ADC]",ld),100,0,500,100,0,500);
   }
 
  //eta vectors definition
@@ -454,16 +506,27 @@ clusterseed_p1_n_histo[ld]=new TH2D(Form("clusterseed_p1_n_%d",ld),Form("cluster
   int ncounts[N_LADDER]={0};
   for(int vec=0;vec<(int)storage.size();++vec){
       for(int nev=0;nev<(int)(storage.at(vec).size());++nev){// I want to correct values for f_eta and fill all the histograms here.
-	double x_p[N_LADDER]={0.};
-	double x_n[N_LADDER]={0.};
-	double sn_p[N_LADDER]={0.};
-	double sn_n[N_LADDER]={0.};
-	int seed_p[N_LADDER]={0 };
-	int seed_n[N_LADDER]={0 };
-	 bool pcheck[N_LADDER];
-	 bool ncheck[N_LADDER];
+	double x_p[N_LADDER];
+	double x_n[N_LADDER];
+	double sn_p[N_LADDER];
+	double sn_n[N_LADDER];
+	double charge_p[N_LADDER];
+	double charge_n[N_LADDER];
+
+	int seed_p[N_LADDER];
+	int seed_n[N_LADDER];
+	bool pcheck[N_LADDER];
+	bool ncheck[N_LADDER];
 
 	  for(int ild=0;ild<N_LADDER;++ild){
+	    x_p[ild]=0.;
+	    x_n[ild]=0.;
+	    sn_p[ild]=0.;
+	    sn_n[ild]=0.;
+	    charge_p[ild]=0.;
+	    charge_n[ild]=0.;
+	    seed_p[ild]=0;
+	    seed_n[ild]=0;
 	    pcheck[ild]=0;
 	    ncheck[ild]=0;
 	  }
@@ -482,6 +545,7 @@ clusterseed_p1_n_histo[ld]=new TH2D(Form("clusterseed_p1_n_%d",ld),Form("cluster
 	  double chargecenter=0.;
 	  double totcharge=1.;
 	  double eta=storage.at(vec).at(nev).cls.at(ncl).GetEta();
+	  double charge=storage.at(vec).at(nev).cls.at(ncl).GetCounts(0.);
 	  
 	  double sign_cluster=0.;
 	  double sign_cluster_num=0.;
@@ -517,6 +581,7 @@ clusterseed_p1_n_histo[ld]=new TH2D(Form("clusterseed_p1_n_%d",ld),Form("cluster
 	    //chargecenter=9999.;
 	    if(!x_n[ladder] || sign_cluster>sn_n[ladder]){
 	    x_n[ladder]=(double)(ev_seed%SIDE_CHAN)+(chargecenter/totcharge-CLUSTERCHANNELS/2);
+	    charge_n[ladder]=charge;
 	    sn_n[ladder]=sign_cluster; //Warning!!!! Should use the squared sum??
 	    }
 	    
@@ -574,6 +639,7 @@ clusterseed_p1_n_histo[ld]=new TH2D(Form("clusterseed_p1_n_%d",ld),Form("cluster
 	    //chargecenter=9999.;
 	    if(!x_p[ladder] || sign_cluster>sn_p[ladder]){ // ?????????
 	    x_p[ladder]=(double)(ev_seed%SIDE_CHAN)+(chargecenter/totcharge-CLUSTERCHANNELS/2);
+	    charge_p[ladder]=charge;
 	    sn_p[ladder]=sign_cluster; //warning! see n case for more information
 	    }
    	    
@@ -642,8 +708,12 @@ clusterseed_p1_n_histo[ld]=new TH2D(Form("clusterseed_p1_n_%d",ld),Form("cluster
 	  check_timing_left_histo->Fill(ev_adc_seed,(ev_adc_seed-ev_adc_m1)/ev_adc_seed);
 	  
 	}
-	if(x_p[2]!=0. && x_p[3]!=0. && x_n[2]!=0. && x_n[3]!=0.)
-	    outputfile << nev <<"\t"<< x_p[2] <<"\t"<<x_p[3]<<"\t"<<x_n[2]<<"\t"<<x_n[3] <<std::endl;
+	for(int ild=0;ild<N_LADDER;++ild){
+	  if(charge_p[ild]!=0. && charge_n[ild]!=0.)
+	    charge_sharing_pn_histo[ild]->Fill(charge_p[ild],charge_n[ild]);
+	}
+	//if(x_p[2]!=0. && x_p[3]!=0. && x_n[2]!=0. && x_n[3]!=0.)
+	  //outputfile << nev <<"\t"<< x_p[2] <<"\t"<<x_p[3]<<"\t"<<x_n[2]<<"\t"<<x_n[3] <<std::endl;
       }
     }
  significativit_histo->Write();
@@ -700,7 +770,8 @@ clusterseed_p1_n_histo[ld]=new TH2D(Form("clusterseed_p1_n_%d",ld),Form("cluster
     cluster_shape_p_histo[ld]->Write();
     cluster_shape_n_histo[ld]->Write();
     charge_center_corr_p_hist[ld]->Write();
-    charge_center_corr_n_hist[ld]->Write(); 
+    charge_center_corr_n_hist[ld]->Write();
+    charge_sharing_pn_histo[ld]->Write();
   }
 
     TCanvas *out=new TCanvas();
@@ -772,6 +843,7 @@ clusterseed_p1_n_histo[ld]=new TH2D(Form("clusterseed_p1_n_%d",ld),Form("cluster
   drawing6_2D(adc_p1_m1_n_histo)->Print(Stream3.str().c_str());
   out->Print(Stream3_close.str().c_str());
 */
+    
   std::stringstream Stream4;
   std::stringstream Stream4_open;
   std::stringstream Stream4_close;
@@ -779,7 +851,7 @@ clusterseed_p1_n_histo[ld]=new TH2D(Form("clusterseed_p1_n_%d",ld),Form("cluster
   Stream4_open<<outputname<<"_eta.pdf[";
   Stream4_close<<outputname<<"_eta.pdf]";
   out->Print(Stream4_open.str().c_str());
-
+  /*
   drawing6_1D(charge_center_p_hist)->Print(Stream4.str().c_str());
   drawing6_1D(charge_center_n_hist)->Print(Stream4.str().c_str());
   drawing6_1D(clustersize_p_hist)->Print(Stream4.str().c_str());
@@ -809,17 +881,21 @@ clusterseed_p1_n_histo[ld]=new TH2D(Form("clusterseed_p1_n_%d",ld),Form("cluster
   //drawing1D(n3_cluster_place,0)->Print(Stream4.str().c_str());
   drawing2D( check_timing_right_histo,"check_timing_righ;ADC_seed;(ADC_right-ADC_seed)/ADC_seed")->Print(Stream4.str().c_str());
   drawing2D( check_timing_left_histo,"check_timing_left;ADC_seed;(ADC_left-ADC_seed)/ADC_seed")->Print(Stream4.str().c_str());
+    */
+  drawing6_2D(charge_sharing_pn_histo)->Print(Stream4.str().c_str());
   out->Print(Stream4_close.str().c_str());
+    
   std::stringstream Stream5;
   Stream5<<outputname<<"_efficiency.txt";
   std:: ofstream eff_files(Stream5.str().c_str(),std::ofstream::app);
-  
+  eff_files<<MAXEVENTS<<std::endl;
   for(int ld=0;ld<N_LADDER;++ld){
     std::cout<<"Ladder "<<ld <<" side p: "<<pcounts[ld]<<" Overall efficiency: "<<pcounts[ld]/(double)MAXEVENTS<< " Error: "<<sqrt(pcounts[ld]*(1-pcounts[ld]/(double)MAXEVENTS)) <<std::endl;
-    eff_files << ld <<"\t p \t" << pcounts[ld]/(double)MAXEVENTS;
+    eff_files <<CLFINDTHRESHOLD<<"\t" << CLSNTHRESHOLD <<"\t"<< ld <<"\t p \t" << pcounts[ld]/(double)MAXEVENTS<<std::endl;
+    
     std::cout<<"Ladder "<<ld <<" side n: "<<ncounts[ld]<<" Overall efficiency: "<<ncounts[ld]/(double)MAXEVENTS<< " Error: "<<sqrt(pcounts[ld]*(1-pcounts[ld]/(double)MAXEVENTS)) <<std::endl;
-    eff_files << ld <<"\t n \t" << ncounts[ld]/(double)MAXEVENTS;
-
+    eff_files<<CLFINDTHRESHOLD<<"\t" << CLSNTHRESHOLD <<"\t" << ld <<"\t n \t" << ncounts[ld]/(double)MAXEVENTS<<std::endl;
+    
     }
 }
 
@@ -911,6 +987,7 @@ void analysis(std::string namefile,std::string calib_file,std::string outputname
   TFile *output2=new TFile(Stream_root.str().c_str(),"RECREATE");
   //definig only histos that are not cluster-related
   TH2D *common_noise_total=new TH2D("common_noise_total","",N_VA,0,N_VA,500,-100,100);
+  TH1D *VA_noise_hist=new TH1D("VA_noise","VA_noise;evt;ADC",NCALIBEVENTS,0,NCALIBEVENTS);
   TH1D *sigmadist1_hist[N_SIDES][N_LADDER];
   TH1D *NGIdist1_hist[N_SIDES][N_LADDER];
 
@@ -1015,7 +1092,10 @@ void analysis(std::string namefile,std::string calib_file,std::string outputname
       if(myevent.cls.size()>0) clev.push_back(myevent);
     }
     storage.push_back(clev);
+    
     for(int iev=0;iev<NCALIBEVENTS;iev++){
+      if(ipk==N_PKG/2)
+	VA_noise_hist->Fill(iev,CN_matrix_clean[iev][13]);
       for(int iva=0;iva<N_VA;iva++){
 	common_noise_total->Fill(iva,CN_matrix_clean[iev][iva]);
       }
@@ -1025,7 +1105,7 @@ void analysis(std::string namefile,std::string calib_file,std::string outputname
   ClusterManager(storage,MAXEVENTS,eta_dist_p,eta_dist_n,output2,outputname);
   //}
   //common_noise_total->Write();
-  
+  VA_noise_hist->Write();
   TCanvas *out=new TCanvas();
   /*
  std::stringstream Stream2;
@@ -1047,6 +1127,7 @@ void analysis(std::string namefile,std::string calib_file,std::string outputname
   display_ladders2D(significativit_histo,"SN",";chan;SN")->Print(Stream2.str().c_str());
   //display_ladders1D(good_chan_hist,"good_channel",";chan;")->Print(Stream2.str().c_str());
   */
+  /*
   std::stringstream Stream4;
   std::stringstream Stream4_open;
   std::stringstream Stream4_close;
@@ -1058,7 +1139,20 @@ void analysis(std::string namefile,std::string calib_file,std::string outputname
     drawing6_1D(sigmadist1_hist[side])->Print(Stream4.str().c_str());
     drawing6_1D(NGIdist1_hist[side])->Print(Stream4.str().c_str());
   }
-  out->Print(Stream4_close.str().c_str());
+ out->Print(Stream4_close.str().c_str());
+  */
+  //New CN study and threshold study
+  /*
+  std::stringstream Stream5;
+  std::stringstream Stream5_open;
+  std::stringstream Stream5_close;
+  Stream5<<outputname <<"_threshold.pdf";
+  Stream5_open<<outputname<<"_threshold.pdf[";
+  Stream5_close<<outputname<<"_threshold.pdf]";
+  out->Print(Stream5_open.str().c_str());
+  drawing1D(VA_noise_hist,0)->Print(Stream5.str().c_str());
+  out->Print(Stream5_close.str().c_str());
+  */
 }
 
 void analysis_ondata(std::string namefile,std::string outputname){

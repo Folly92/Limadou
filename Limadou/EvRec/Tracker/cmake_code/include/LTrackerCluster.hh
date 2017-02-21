@@ -6,7 +6,7 @@ const int NEV_WINDOW = CLUSTERCHANNELS+2;
 const double MAX_SIGMA2=300.;
 
 const double CLFINDTHRESHOLD=3.;
-const double CLSNTHRESHOLD=4.5;//
+const double CLSNTHRESHOLD=3.5;//
 
 
 class LTrackerCluster {
